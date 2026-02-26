@@ -1,6 +1,6 @@
 [package]
 name = "log-scout-lsp-server"
-version = "0.1.52"
+version = "0.1.53"
 edition = "2021"
 authors = ["Log Scout Team"]
 description = "Language Server Protocol server for log file analysis"
