@@ -9,10 +9,10 @@ license = "MIT"
 [[bin]]
 name = "log-scout-lsp-server"
 path = "src/main.rs"
-
-[[bin]]
-name = "test-tagscout"
-path = "src/bin/test-tagscout.rs"
+# 
+# [[bin]]
+# name = "test-tagscout"
+# path = "src/bin/test-tagscout.rs"
 
 [dependencies]
 # LSP protocol implementation
