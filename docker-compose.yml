@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  log-scout-lsp-server:
+    image: ghcr.io/mitchong-csco/log-scout-lsp-server:latest
+    container_name: log-scout-lsp-server
+    restart: unless-stopped
+
+    # Enable Watchtower auto-updates
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+    # No port mapping needed - LSP runs in stdio mode
+    # ports:
+    #   - "8080:8080"
+
+    # Volume mounts for logs and persistence
+    volumes:
+      - log-scout-logs:/tmp/log-scout-analyzer
+      - log-scout-cache:/home/lspuser/.log-scout-analyzer
+
+    # Environment variables
+    environment:
+      - RUST_LOG=info
+      - RUST_BACKTRACE=1
+
+    # Health check
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep -f log-scout-lsp-server || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 128M
+
+    # Keep container running (LSP server waits for stdio input)
+    command: ["tail", "-f", "/dev/null"]
+
+volumes:
+  log-scout-logs:
+    driver: local
+  log-scout-cache:
+    driver: local
