@@ -36,7 +36,7 @@ High-performance Language Server Protocol implementation for log file analysis w
 
 🐳 **Container Support**
 - Docker image for easy deployment
-- Automatic builds and pushes to containers.cisco.com
+- Automatic builds and pushes to GitHub Container Registry
 - Multi-platform support (linux/amd64, linux/arm64)
 
 ## Quick Start
@@ -44,14 +44,14 @@ High-performance Language Server Protocol implementation for log file analysis w
 ### Using Docker Container (Recommended)
 
 ```bash
-# Pull from Cisco container registry
-docker pull containers.cisco.com/log-scout-lsp-server:latest
+# Pull from GitHub Container Registry
+docker pull ghcr.io/mitchong-csco/log-scout-lsp-server:latest
 
 # Run with stdio communication
-docker run --rm -i containers.cisco.com/log-scout-lsp-server:latest --stdio
+docker run --rm -i ghcr.io/mitchong-csco/log-scout-lsp-server:latest --stdio
 
 # Run with TCP communication
-docker run --rm -p 8080:8080 containers.cisco.com/log-scout-lsp-server:latest --tcp --port 8080
+docker run --rm -p 8080:8080 ghcr.io/mitchong-csco/log-scout-lsp-server:latest --tcp --port 8080
 ```
 
 ### Local Build
