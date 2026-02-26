@@ -55,59 +55,23 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64
 
-      - name: Generate container image digest
-        id: digest
-        run: |
-          DIGEST="${{ steps.docker_build.outputs.digest }}"
-          echo "digest=$DIGEST" >> $GITHUB_OUTPUT
-          echo "🔐 Image Digest: $DIGEST"
-
       - name: Create checksums file
         run: |
-          cat > checksums.txt << EOC
+          cat > checksums.txt << 'EOC'
           # Log Scout LSP Server - Release ${{ steps.version.outputs.version }}
-
+          
           ## Container Image
           Registry: ${{ env.REGISTRY }}
           Image: ${{ env.IMAGE_NAME }}
           Tag: ${{ steps.version.outputs.version }}
-
-          ## Verification
+          
+          ## Verification  
           Image Digest (SHA256): ${{ steps.docker_build.outputs.digest }}
-
-          ## Build Information
-          Version: ${{ steps.version.outputs.version }}
-          Git Commit: ${{ github.sha }}
-          Built At: $(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          Built By: GitHub Actions
-          Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
+          
           ## Container Pull Commands
-          # Pull by version tag
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
-
-          # Pull by digest (immutable)
-          docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
-
-          # Pull latest
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-
-          ## Verification
-          # Verify image digest
-          docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} --format='{{.RepoDigests}}'
-
-          # Expected: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
           EOC
-
-          echo "✅ Created checksums.txt"
-          cat checksums.txt
-
-      - name: Generate SBOM (Software Bill of Materials)
-        uses: anchore/sbom-action@v0
-        with:
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}
-          format: spdx-json
-          output-file: sbom-${{ steps.version.outputs.version }}.spdx.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -121,28 +85,9 @@ jobs:
             docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
             ```
 
-            ### 🔐 Verification
-            **Image Digest:** `${{ steps.docker_build.outputs.digest }}`
-
-            Verify the image:
-            ```bash
-            docker inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }} \
-              --format='{{.RepoDigests}}'
-            ```
-
-            Expected: `${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@${{ steps.docker_build.outputs.digest }}`
-
-            ### 📋 Artifacts
-            - `checksums.txt` - Full verification details
-            - `sbom-${{ steps.version.outputs.version }}.spdx.json` - Software Bill of Materials
-
-            ### 🔗 Links
-            - [Container Registry](https://github.com/${{ github.repository_owner }}/log-scout-lsp-server/pkgs/container/log-scout-lsp-server)
-            - [Workflow Run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
-            - [Source Code](https://github.com/${{ github.repository }}/tree/${{ github.ref_name }})
-          files: |
-            checksums.txt
-            sbom-${{ steps.version.outputs.version }}.spdx.json
+            ### 🔐 Image Digest
+            `${{ steps.docker_build.outputs.digest }}`
+          files: checksums.txt
           draft: false
           prerelease: false
           generate_release_notes: true
